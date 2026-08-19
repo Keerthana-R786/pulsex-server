@@ -42,10 +42,10 @@ router.post('/', async (req, res) => {
   const coverage_id = payer_member_id ? generateCoverageId(payer_member_id) : null;
   const contact_verification_id = generateContactVerificationId();
 
-  // Auto-verify physician email if domain matches practice
-  const emailDomain = referring_physician_email?.split('@')[1]?.toLowerCase() || '';
-  const practiceDomain = specialist_practice?.toLowerCase().replace(/\s+/g, '') || '';
-  const emailVerified = emailDomain && (practiceDomain.includes(emailDomain.split('.')[0]) || emailDomain.includes(practiceDomain.split(' ')[0]));
+  // Auto-verify physician email if domain shares a word with practice name
+  const emailDomain = (referring_physician_email?.split('@')[1] || '').toLowerCase();
+  const practiceWords = (specialist_practice || '').toLowerCase().split(/\s+/);
+  const emailVerified = emailDomain && practiceWords.some(w => w.length > 3 && emailDomain.includes(w));
 
   const { data, error } = await supabase
     .from('referrals')

@@ -1,6 +1,32 @@
 const router = require('express').Router();
+const crypto = require('crypto');
 const supabase = require('../services/supabase');
 const { generateReferralId, generateOrderId, generateCoverageId, generateContactVerificationId } = require('../utils/id-generators');
+
+async function triggerYoxa(referral) {
+  const url = process.env.YOXA_TRIGGER_URL;
+  const secret = process.env.YOXA_DEPLOYMENT_SECRET;
+  if (!url || !secret) return null;
+
+  const trigger_text = `Patient ${referral.patient_name}, DOB ${referral.patient_dob || 'unknown'}, phone ${referral.patient_contact_phone || 'unknown'}, email ${referral.patient_contact_email || 'unknown'}, preferred contact ${referral.patient_preferred_channel || 'phone'}. Referred by ${referral.referring_physician_name} (NPI ${referral.referring_physician_npi || 'unknown'}, ${referral.referring_physician_email}) for ${referral.specialty} specialty to ${referral.specialist_name || 'any'} at ${referral.specialist_practice || 'any'}. Payer: ${referral.payer_name}, member ID ${referral.payer_member_id || 'unknown'}. Reason: ${referral.reason_for_referral}. Referral ID: ${referral.referral_id}`;
+
+  try {
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'X-Yoxa-Deployment-Secret': secret,
+        'Idempotency-Key': crypto.randomUUID(),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ trigger_text }),
+    });
+    const data = await resp.json();
+    return data;
+  } catch (e) {
+    console.error('YOXA trigger failed:', e.message);
+    return null;
+  }
+}
 
 // POST /api/v1/referrals — Create new referral (UI endpoint)
 router.post('/', async (req, res) => {
@@ -30,7 +56,14 @@ router.post('/', async (req, res) => {
     .single();
 
   if (error) return res.status(500).json({ error: 'insert_failed', message: error.message });
-  res.status(201).json(data);
+
+  // Trigger YOXA workflow in background
+  const yoxaResult = await triggerYoxa(data);
+
+  res.status(201).json({
+    ...data,
+    yoxa_workflow: yoxaResult || { status: 'trigger_config_pending' },
+  });
 });
 
 // GET /api/v1/referrals — List all referrals (UI endpoint)

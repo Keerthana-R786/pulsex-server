@@ -15,6 +15,7 @@ app.use('/api/v1/specialist', require('./routes/specialist'));
 app.use('/api/v1/audit', require('./routes/audit'));
 app.use('/api/v1/escalation', require('./routes/escalation'));
 app.use('/api/v1/resolution', require('./routes/resolution'));
+app.use('/api/v1/trigger', require('./routes/trigger'));
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`PulseX server running on port ${PORT}`));

@@ -42,12 +42,17 @@ router.post('/', async (req, res) => {
   const coverage_id = payer_member_id ? generateCoverageId(payer_member_id) : null;
   const contact_verification_id = generateContactVerificationId();
 
+  // Auto-verify physician email if domain matches practice
+  const emailDomain = referring_physician_email?.split('@')[1]?.toLowerCase() || '';
+  const practiceDomain = specialist_practice?.toLowerCase().replace(/\s+/g, '') || '';
+  const emailVerified = emailDomain && (practiceDomain.includes(emailDomain.split('.')[0]) || emailDomain.includes(practiceDomain.split(' ')[0]));
+
   const { data, error } = await supabase
     .from('referrals')
     .insert({
       referral_id, patient_name, patient_dob, patient_contact_phone, patient_contact_email,
       patient_preferred_channel, referring_physician_name, referring_physician_email,
-      referring_physician_npi, physician_email_verified: false, order_id, specialty,
+      referring_physician_npi, physician_email_verified: emailVerified, order_id, specialty,
       specialist_name, specialist_practice, payer_name, payer_member_id, coverage_id,
       coverage_active: true, coverage_active_until: '2025-12-31', reason_for_referral,
       status: 'intake'

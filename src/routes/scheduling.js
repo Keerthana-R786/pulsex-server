@@ -8,7 +8,7 @@ router.post('/contact-and-book', async (req, res) => {
   const { data: referral } = await supabase.from('referrals').select('*').eq('referral_id', referral_id).single();
   if (!referral) return res.status(404).json({ error: 'not_found', message: 'Referral not found' });
 
-  const reachable = patient_phone && Math.random() > 0.3;
+  const reachable = true;
   const appointmentId = `SCH-${Date.now()}`;
 
   if (reachable) {

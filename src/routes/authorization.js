@@ -26,8 +26,8 @@ router.post('/check', async (req, res) => {
       cpt_code: cpt_code || '99204', valid_from: new Date().toISOString().split('T')[0],
       valid_until: new Date(Date.now() + 90 * 86400000).toISOString().split('T')[0],
       servicing_provider: `${specialist_practice} / ${specialist_practice}`,
-      denial_reason: null, denial_code: null,
-      response_source: 'explicit_payer_response', next_action: null,
+      denial_reason: '', denial_code: '',
+      response_source: 'explicit_payer_response', next_action: '',
       note: 'Response is explicit and does not rely on coverage or network inference',
     });
   } else {
@@ -35,8 +35,8 @@ router.post('/check', async (req, res) => {
       referral_id, queried_at: new Date().toISOString(),
       authorization_status: 'DENIED', authorization_id: authId,
       payer_response_id: responseId, approved_visits: 0,
-      cpt_code: cpt_code || '99205', valid_from: null, valid_until: null,
-      servicing_provider: null,
+      cpt_code: cpt_code || '99205', valid_from: '', valid_until: '',
+      servicing_provider: '',
       denial_reason: 'Submitted record did not document required conservative-treatment trial',
       denial_code: 'NS-CONSERVATIVE-TRIAL-MISSING',
       response_source: 'explicit_payer_response',

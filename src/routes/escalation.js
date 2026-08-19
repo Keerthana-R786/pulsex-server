@@ -16,7 +16,7 @@ router.post('/review', async (req, res) => {
 
   res.status(201).json({
     review_id, referral_id, escalation_reason, status: 'pending',
-    created_at: new Date().toISOString(), assigned_coordinator: null,
+    created_at: new Date().toISOString(), assigned_coordinator: '',
   });
 });
 

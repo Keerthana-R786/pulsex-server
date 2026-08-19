@@ -115,7 +115,7 @@ router.get('/:id/context', async (req, res) => {
     },
     authorization_status: 'unassessed',
     case_age_days: Math.floor((Date.now() - new Date(data.created_at).getTime()) / 86400000),
-    urgency: null,
+    urgency: '',
     source_identifiers: {
       intake_order: data.order_id,
       coverage_record: data.coverage_id,

@@ -23,13 +23,13 @@ router.post('/contact-and-book', async (req, res) => {
         slot_status: 'CONFIRMED',
       },
       reminder_scheduled: new Date(Date.now() + 86400000).toISOString().split('T')[0],
-      reachability_status: 'CONTACTABLE', follow_up_recommendation: null,
+      reachability_status: 'CONTACTABLE', follow_up_recommendation: '',
     });
   } else {
     res.json({
       referral_id, outcome: 'PATIENT_UNREACHABLE', patient_reachable: false,
       contact_attempts: max_contact_attempts || 3, contact_channel: preferred_channel || 'phone',
-      patient_confirmed: false, appointment: null,
+      patient_confirmed: false, appointment: {},
       reachability_status: 'UNREACHABLE',
       follow_up_recommendation: 'One additional outreach attempt within two business days after authorization clarification',
     });

@@ -2,7 +2,7 @@ const sgMail = require('@sendgrid/mail');
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-const FROM_EMAIL = 'pulsex-workflow@demo.com';
+const FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || 'pulsex-workflow@demo.com';
 
 async function sendEmail(to, subject, html) {
   try {

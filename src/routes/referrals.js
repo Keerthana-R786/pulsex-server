@@ -2,6 +2,7 @@ const router = require('express').Router();
 const crypto = require('crypto');
 const supabase = require('../services/supabase');
 const { generateReferralId, generateOrderId, generateCoverageId, generateContactVerificationId } = require('../utils/id-generators');
+const { runWorkflow } = require('../services/workflow-runner');
 
 async function triggerYoxa(referral) {
   const url = process.env.YOXA_TRIGGER_URL;
@@ -64,6 +65,9 @@ router.post('/', async (req, res) => {
 
   // Trigger YOXA workflow in background
   const yoxaResult = await triggerYoxa(data);
+
+  // Trigger local workflow runner in background (non-blocking)
+  runWorkflow(data).catch(e => console.error('Workflow runner error:', e.message));
 
   res.status(201).json({
     ...data,
